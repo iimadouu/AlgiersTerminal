@@ -1,44 +1,77 @@
-/*global define, brackets, $ */
-
-// See detailed docs in https://docs.phcode.dev/api/creating-extensions
-
-// A good place to look for code examples for extensions: https://github.com/phcode-dev/phoenix/tree/main/src/extensions/default
-
-// A simple extension that adds an entry in "file menu> hello world"
 define(function (require, exports, module) {
     "use strict";
 
-    // Brackets modules
     const AppInit = brackets.getModule("utils/AppInit"),
-        DefaultDialogs = brackets.getModule("widgets/DefaultDialogs"),
-        Dialogs = brackets.getModule("widgets/Dialogs"),
         CommandManager = brackets.getModule("command/CommandManager"),
         Menus = brackets.getModule("command/Menus");
 
-    // Function to run when the menu item is clicked
-    function handleHelloWorld() {
-        Dialogs.showModalDialog(
-            DefaultDialogs.DIALOG_ID_INFO,
-            "hello",
-            "world"
-        );
-    }
-    
-      // First, register a command - a UI-less object associating an id to a handler
-    var MY_COMMAND_ID = "helloworld.sayhello";   // package-style naming to avoid collisions
-    CommandManager.register("Hello World", MY_COMMAND_ID, handleHelloWorld);
+    const COMMAND_ID = "myTerminal.toggle";
 
-    // Then create a menu item bound to the command
-    // The label of the menu item is the name we gave the command (see above)
-    var menu = Menus.getMenu(Menus.AppMenuBar.FILE_MENU);
-    menu.addMenuItem(MY_COMMAND_ID);
-    
-    // We could also add a key binding at the same time:
-    //menu.addMenuItem(MY_COMMAND_ID, "Ctrl-Alt-W");
-    // (Note: "Ctrl" is automatically mapped to "Cmd" on Mac)
-    
-    // Initialize extension once shell is finished initializing.
-    AppInit.appReady(function () {
-        console.log("hello world");
+    // Initialize terminal functionality
+    function initTerminal() {
+        const terminal = document.getElementById("my-terminal");
+        const outputElement = document.getElementById("terminal-output");
+        const inputElement = document.getElementById("terminal-input");
+
+        const commands = {
+            clear: () => {
+                outputElement.innerHTML = "";
+            },
+            help: () => {
+                return "Available commands: clear, help, echo [message]";
+            },
+            echo: (args) => {
+                return args.join(" ");
+            },
+        };
+
+        function appendOutput(content, isError = false) {
+            const line = document.createElement("div");
+            line.textContent = content;
+            line.style.color = isError ? "red" : "inherit";
+            outputElement.appendChild(line);
+            outputElement.scrollTop = outputElement.scrollHeight;
+        }
+
+        inputElement.addEventListener("keypress", (e) => {
+            if (e.key === "Enter") {
+                const input = inputElement.value.trim();
+                inputElement.value = "";
+
+                appendOutput(`> ${input}`);
+
+                if (!input) return;
+
+                const [command, ...args] = input.split(" ");
+
+                if (commands[command]) {
+                    try {
+                        const result = commands[command](args);
+                        if (result) appendOutput(result);
+                    } catch (err) {
+                        appendOutput(`Error: ${err.message}`, true);
+                    }
+                } else {
+                    appendOutput(`Unknown command: ${command}`, true);
+                }
+            }
+        });
+    }
+
+    // Register menu command
+    CommandManager.register("Toggle Terminal", COMMAND_ID, () => {
+        const terminal = document.getElementById("my-terminal");
+        terminal.style.display = terminal.style.display === "none" ? "block" : "none";
+    });
+
+    const menu = Menus.getMenu(Menus.AppMenuBar.VIEW_MENU);
+    menu.addMenuItem(COMMAND_ID);
+
+    AppInit.appReady(() => {
+        require(["text!path/to/terminal.html", "text!path/to/main.css"], (html, css) => {
+            $("body").append(html);
+            $("<style>").text(css).appendTo("head");
+            initTerminal();
+        });
     });
 });
