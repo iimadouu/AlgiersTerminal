@@ -1,17 +1,18 @@
 {
-    "name": "AlgiersTerminal",
+    "name": "github.iimadouu.AlgiersTerminal",
+    "title": "AlgiersTerminal",
     "version": "0.0.1",
     "description": "A custom terminal extension for Phoenix Code IDE.",
     "main": "main.js",
     "author": "iimadouu",
     "license": "MIT"
-    "homepage": "<project web page url or this github repo url if no website available>",
+    "homepage": "https://github.com/iimadouu/AlgiersTerminal",
     "engines": {
-        "brackets": ">=2.0.0"
+        "brackets": ">=3.0.0"
     },
     "categories": "demo",
     "keywords": [
-        "phcode", "extension", "demo"
+        "phcode", "extension", "demo", "terminal", "shell"
     ],
     "files": [
         "main.js"
