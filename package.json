@@ -1,10 +1,10 @@
 {
-    "title": "Name of the extension",
-    "name": "github-<owner>-<repo>",
-    "description": "A sample extension.",
+    "name": "AlgiersTerminal",
     "version": "0.0.1",
-    "license": "MIT",
-    "author": "your name (https://github.com/<your github id>)",
+    "description": "A custom terminal extension for Phoenix Code IDE.",
+    "main": "main.js",
+    "author": "iimadouu",
+    "license": "MIT"
     "homepage": "<project web page url or this github repo url if no website available>",
     "engines": {
         "brackets": ">=2.0.0"
